@@ -12,6 +12,8 @@ import {
   HardDrive,
   Cpu,
   CheckCircle2,
+  Sparkles,
+  Radio,
 } from "lucide-react";
 
 interface NodeData {
@@ -30,58 +32,64 @@ const CustomSecurityNode = ({ data, selected }: { data: NodeData; selected: bool
   const tier = properties.tier;
   const status = properties.status;
   const risk = properties.risk_level;
+  const isTier0 = tier === "TIER_0_CRITICAL";
 
-  // Icon & color by node type
+  // Visual appearance by category
   const getTypeConfig = () => {
     switch (nodeType) {
       case "Workload":
         return {
-          icon: <Server className="w-4 h-4 text-violet-400" />,
-          border: status === "compromised" ? "border-red-500/70" : "border-violet-500/40",
-          bg: "bg-surface",
+          icon: <Server className="w-3.5 h-3.5 text-violet-400" />,
+          accentColor: "#8B5CF6",
           badge: env ? `${env.toUpperCase()}` : "WORKLOAD",
-          badgeColor: env === "production" ? "bg-red-500/10 text-red-400 border-red-500/30" : "bg-violet-500/10 text-violet-300 border-violet-500/30",
+          badgeClass: env === "production" ? "bg-red-500/15 text-red-300 border-red-500/30" : "bg-violet-500/15 text-violet-300 border-violet-500/30",
+          border: status === "compromised" ? "border-red-500/80 shadow-[0_0_15px_rgba(239,68,68,0.25)]" : "border-violet-500/30 hover:border-violet-400/60",
+          bg: "bg-surface-card",
         };
       case "Identity":
         return {
-          icon: <Shield className="w-4 h-4 text-amber-400" />,
-          border: isOnAttackPath ? "border-red-500/60" : "border-amber-500/30",
-          bg: "bg-surface",
+          icon: <Shield className="w-3.5 h-3.5 text-amber-400" />,
+          accentColor: "#F59E0B",
           badge: properties.type ? properties.type.replace("_", " ").toUpperCase() : "IDENTITY",
-          badgeColor: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+          badgeClass: "bg-amber-500/15 text-amber-300 border-amber-500/30",
+          border: isOnAttackPath ? "border-red-500/70 shadow-[0_0_15px_rgba(239,68,68,0.2)]" : "border-amber-500/30 hover:border-amber-400/60",
+          bg: "bg-surface-card",
         };
       case "PermissionPolicy":
         return {
-          icon: <Lock className="w-4 h-4 text-rose-400" />,
-          border: risk === "CRITICAL" ? "border-rose-500/70" : "border-slate-700",
-          bg: "bg-surface",
+          icon: <Lock className="w-3.5 h-3.5 text-rose-400" />,
+          accentColor: "#F43F5E",
           badge: risk ? `${risk} POLICY` : "POLICY",
-          badgeColor: risk === "CRITICAL" ? "bg-rose-500/15 text-rose-400 border-rose-500/30" : "bg-slate-700/30 text-slate-400 border-slate-700",
+          badgeClass: risk === "CRITICAL" ? "bg-rose-500/20 text-rose-300 border-rose-500/40" : "bg-slate-700/40 text-slate-300 border-slate-600",
+          border: risk === "CRITICAL" ? "border-rose-500/70 shadow-[0_0_15px_rgba(244,63,94,0.2)]" : "border-border hover:border-slate-500",
+          bg: "bg-surface-card",
         };
       case "Resource":
-        const isTier0 = tier === "TIER_0_CRITICAL";
         return {
-          icon: isTier0 ? <Database className="w-4 h-4 text-red-400" /> : <HardDrive className="w-4 h-4 text-emerald-400" />,
-          border: isTier0 ? "border-red-500/80 shadow-[0_0_12px_rgba(239,68,68,0.25)]" : "border-emerald-500/40",
-          bg: "bg-surface",
+          icon: isTier0 ? <Database className="w-3.5 h-3.5 text-amber-300" /> : <HardDrive className="w-3.5 h-3.5 text-cyan-400" />,
+          accentColor: isTier0 ? "#F59E0B" : "#06B6D4",
           badge: isTier0 ? "TIER-0 CROWN JEWEL" : "RESOURCE",
-          badgeColor: isTier0 ? "bg-red-500/20 text-red-300 border-red-500/40 animate-pulse" : "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+          badgeClass: isTier0 ? "bg-amber-500/20 text-amber-300 border-amber-500/40" : "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
+          border: isTier0 ? "border-amber-500/80 shadow-[0_0_20px_rgba(245,158,11,0.3)] ring-1 ring-amber-500/40" : "border-cyan-500/30 hover:border-cyan-400/60",
+          bg: isTier0 ? "bg-surface-elevated" : "bg-surface-card",
         };
       case "Secret":
         return {
-          icon: <Key className="w-4 h-4 text-amber-400" />,
-          border: "border-amber-500/50",
-          bg: "bg-surface",
-          badge: "SECRET",
-          badgeColor: "bg-amber-500/10 text-amber-300 border-amber-500/30",
+          icon: <Key className="w-3.5 h-3.5 text-amber-400" />,
+          accentColor: "#F59E0B",
+          badge: "SECRET TOKEN",
+          badgeClass: "bg-amber-500/15 text-amber-300 border-amber-500/30",
+          border: "border-amber-500/40 hover:border-amber-400",
+          bg: "bg-surface-card",
         };
       default:
         return {
-          icon: <Cpu className="w-4 h-4 text-slate-400" />,
-          border: "border-border",
-          bg: "bg-surface",
+          icon: <Cpu className="w-3.5 h-3.5 text-slate-400" />,
+          accentColor: "#94A3B8",
           badge: "NODE",
-          badgeColor: "bg-slate-800 text-slate-400 border-slate-700",
+          badgeClass: "bg-slate-800 text-slate-300 border-slate-700",
+          border: "border-border",
+          bg: "bg-surface-card",
         };
     }
   };
@@ -90,64 +98,100 @@ const CustomSecurityNode = ({ data, selected }: { data: NodeData; selected: bool
 
   return (
     <div
-      className={`min-w-[210px] max-w-[260px] rounded-md border p-2.5 transition-all duration-150 ${config.bg} ${config.border} ${
-        selected ? "ring-2 ring-brand ring-offset-2 ring-offset-canvas shadow-lg" : ""
-      } ${isOnAttackPath ? "shadow-[0_0_10px_rgba(239,68,68,0.15)]" : ""}`}
+      className={`relative min-w-[220px] max-w-[270px] rounded-lg border p-3 backdrop-blur-md transition-all duration-200 ${config.bg} ${config.border} ${
+        selected ? "ring-2 ring-brand ring-offset-2 ring-offset-canvas shadow-glow" : ""
+      }`}
     >
-      {/* Handles */}
-      <Handle type="target" position={Position.Left} className="w-2 h-2 !bg-violet-400" />
-      <Handle type="source" position={Position.Right} className="w-2 h-2 !bg-violet-400" />
+      {/* Top Accent Line */}
+      <div
+        className="absolute top-0 left-2 right-2 h-[2px] rounded-full opacity-80"
+        style={{
+          background: isOnAttackPath
+            ? "linear-gradient(90deg, #FF3B30, #F43F5E)"
+            : isTier0
+            ? "linear-gradient(90deg, #F59E0B, #EF4444)"
+            : `linear-gradient(90deg, ${config.accentColor}, transparent)`,
+        }}
+      />
 
-      {/* Header */}
-      <div className="flex items-center justify-between gap-1.5 pb-1.5 border-b border-border/50">
+      {/* Connection Handles */}
+      <Handle
+        type="target"
+        position={Position.Left}
+        className="w-2.5 h-2.5 !bg-brand !border-2 !border-canvas transition-transform hover:scale-125"
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="w-2.5 h-2.5 !bg-brand !border-2 !border-canvas transition-transform hover:scale-125"
+      />
+
+      {/* Header Row */}
+      <div className="flex items-center justify-between gap-1.5 pb-2 border-b border-border/50">
         <div className="flex items-center gap-1.5 min-w-0">
-          {config.icon}
-          <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted truncate">
+          <div className="p-1 rounded bg-canvas/80 border border-border/60">
+            {config.icon}
+          </div>
+          <span className="text-[10px] font-mono font-medium text-text-muted uppercase tracking-wider truncate">
             {nodeType}
           </span>
         </div>
         <span
-          className={`text-[9px] font-mono px-1.5 py-0.5 rounded border leading-none ${config.badgeColor}`}
+          className={`text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded border leading-none tracking-wide ${config.badgeClass}`}
         >
           {config.badge}
         </span>
       </div>
 
-      {/* Node Title */}
-      <div className="pt-2 pb-1">
-        <p className="text-xs font-semibold text-text-primary truncate font-mono" title={name}>
+      {/* Title & Type */}
+      <div className="pt-2 pb-1.5">
+        <p
+          className="text-xs font-mono font-bold text-text-primary truncate tracking-tight"
+          title={name}
+        >
           {name}
         </p>
         {properties.type && properties.type !== nodeType && (
-          <p className="text-[10px] text-text-muted truncate mt-0.5 font-mono">
-            type: {properties.type}
+          <p className="text-[10px] font-mono text-text-muted truncate mt-0.5">
+            type: <span className="text-text-secondary">{properties.type}</span>
           </p>
         )}
       </div>
 
-      {/* Status Bar / Attack Path Indicator */}
-      <div className="flex items-center justify-between pt-1 border-t border-border/30 text-[10px] font-mono">
+      {/* Threat Status Badge or Attribute Pill */}
+      <div className="flex items-center justify-between pt-1.5 border-t border-border/40 text-[10px] font-mono">
         {status === "compromised" ? (
-          <span className="flex items-center gap-1 text-red-400 font-medium">
-            <AlertTriangle className="w-3 h-3" /> Compromised
+          <span className="flex items-center gap-1 text-red-400 font-semibold animate-pulse">
+            <Radio className="w-3 h-3 text-red-500" /> COMPROMISED
           </span>
         ) : isRemediated ? (
           <span className="flex items-center gap-1 text-emerald-400 font-medium">
-            <CheckCircle2 className="w-3 h-3" /> Remediated
+            <CheckCircle2 className="w-3 h-3" /> VERIFIED SAFE
           </span>
         ) : isOnAttackPath ? (
-          <span className="text-red-400 font-medium flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" /> Threat Hop
+          <span className="flex items-center gap-1 text-red-400 font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+            ATTACK VECTOR
+          </span>
+        ) : isTier0 ? (
+          <span className="flex items-center gap-1 text-amber-400 font-medium">
+            <Sparkles className="w-3 h-3" /> PII / FINANCIAL
           </span>
         ) : (
-          <span className="text-text-muted">
+          <span className="text-text-muted truncate max-w-[130px]">
             {properties.sensitivity || properties.owner || "Standard"}
           </span>
         )}
 
-        {properties.public_ip && (
-          <span className="text-text-muted text-[9px]">{properties.public_ip}</span>
-        )}
+        {properties.public_ip ? (
+          <span className="text-[9px] text-text-dim px-1 rounded bg-canvas border border-border/60">
+            {properties.public_ip}
+          </span>
+        ) : properties.cluster ? (
+          <span className="text-[9px] text-text-dim truncate max-w-[80px]">
+            k8s
+          </span>
+        ) : null}
       </div>
     </div>
   );
