@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0A0B0E;
+  --foreground: #F8FAFC;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #12151C;
+}
+::-webkit-scrollbar-thumb {
+  background: #262D3D;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3B455E;
+}
+
+/* React Flow Dark Canvas Customization */
+.react-flow__renderer {
+  background: #0A0B0E !important;
+}
+
+.react-flow__node {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.react-flow__node:hover {
+  transform: translateY(-1px);
+}
+
+.react-flow__handle {
+  width: 8px !important;
+  height: 8px !important;
+  background: #8B5CF6 !important;
+  border: 2px solid #0A0B0E !important;
+  border-radius: 50% !important;
+}
+
+.react-flow__controls {
+  background: #12151C !important;
+  border: 1px solid #262D3D !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.react-flow__controls-button {
+  background: #12151C !important;
+  border-bottom: 1px solid #262D3D !important;
+  color: #94A3B8 !important;
+  fill: #94A3B8 !important;
+}
+
+.react-flow__controls-button:hover {
+  background: #1A1F2B !important;
+  color: #F8FAFC !important;
+  fill: #F8FAFC !important;
+}
+
+/* Attack Path Animated Pulse / Dash */
+@keyframes flowMarch {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.attack-path-edge {
+  stroke: #EF4444 !important;
+  stroke-width: 2.5 !important;
+  stroke-dasharray: 6 3;
+  animation: flowMarch 1s linear infinite;
+  filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.4));
+}
+
+.legitimate-edge {
+  stroke: #3B82F6 !important;
+  stroke-width: 1.5 !important;
+  stroke-dasharray: 4 4;
+}
+
+.default-edge {
+  stroke: #4B5563 !important;
+  stroke-width: 1.5 !important;
+}
