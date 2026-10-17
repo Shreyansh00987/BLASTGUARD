@@ -183,6 +183,11 @@ export default function BlastGuardPage() {
           onSelectNode={setSelectedNodeId}
           isLoading={isInvestigating}
           isRemediatedClean={isRemediatedClean}
+          onOpenRemediateModal={() => {
+            if (investigation?.candidate_remediations?.[0]) {
+              setRemediationCandidate(investigation.candidate_remediations[0]);
+            }
+          }}
         />
 
         {/* Right Column: Evidence & Remediation Action Panel */}

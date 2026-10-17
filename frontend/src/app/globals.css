@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #060709;
-  --foreground: #FFFFFF;
+  --background: #F8FAFC;
+  --foreground: #0F172A;
 }
 
 body {
@@ -15,28 +15,28 @@ body {
   user-select: none;
 }
 
-/* Custom Cyber Scrollbar */
+/* Custom Clean Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0D1017;
+  background: #F1F5F9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1E2536;
+  background: #CBD5E1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3D4B68;
+  background: #94A3B8;
 }
 
-/* React Flow Canvas Enhancement */
+/* React Flow Canvas Enhancement (Light Theme) */
 .react-flow__renderer {
-  background: #060709 !important;
+  background: #F8FAFC !important;
   background-image: 
-    radial-gradient(ellipse at 50% 20%, rgba(139, 92, 246, 0.08), transparent 60%),
-    radial-gradient(circle at 80% 80%, rgba(239, 68, 68, 0.04), transparent 40%) !important;
+    radial-gradient(circle at 50% 10%, rgba(79, 70, 229, 0.04), transparent 50%),
+    radial-gradient(circle at 90% 90%, rgba(220, 38, 38, 0.03), transparent 40%) !important;
 }
 
 .react-flow__node {
@@ -49,37 +49,37 @@ body {
 }
 
 .react-flow__handle {
-  width: 7px !important;
-  height: 7px !important;
-  background: #8B5CF6 !important;
-  border: 1.5px solid #060709 !important;
+  width: 8px !important;
+  height: 8px !important;
+  background: #4F46E5 !important;
+  border: 2px solid #FFFFFF !important;
   border-radius: 50% !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) !important;
 }
 
 .react-flow__controls {
-  background: rgba(13, 16, 23, 0.9) !important;
-  backdrop-filter: blur(8px) !important;
-  border: 1px solid #1E2536 !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
   border-radius: 8px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08) !important;
   overflow: hidden;
 }
 
 .react-flow__controls-button {
-  background: transparent !important;
-  border-bottom: 1px solid #1E2536 !important;
-  color: #94A3B8 !important;
-  fill: #94A3B8 !important;
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  color: #64748B !important;
+  fill: #64748B !important;
   transition: all 0.15s ease;
 }
 
 .react-flow__controls-button:hover {
-  background: #1A202C !important;
-  color: #FFFFFF !important;
-  fill: #FFFFFF !important;
+  background: #F1F5F9 !important;
+  color: #0F172A !important;
+  fill: #0F172A !important;
 }
 
-/* High-Intensity Laser Animated Threat Edge */
+/* Animated Threat Laser Edge (Light Mode High Contrast) */
 @keyframes attackFlow {
   from {
     stroke-dashoffset: 28;
@@ -90,34 +90,36 @@ body {
 }
 
 .attack-path-edge {
-  stroke: #FF3B30 !important;
-  stroke-width: 2.8 !important;
+  stroke: #DC2626 !important;
+  stroke-width: 2.6 !important;
   stroke-dasharray: 7 4;
   animation: attackFlow 0.8s linear infinite;
-  filter: drop-shadow(0 0 6px rgba(255, 59, 48, 0.65));
+  filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.35));
 }
 
 .legitimate-edge {
-  stroke: #06B6D4 !important;
+  stroke: #0284C7 !important;
   stroke-width: 1.8 !important;
-  stroke-dasharray: 5 4;
-  filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.4));
+  stroke-dasharray: 5 3;
 }
 
 .default-edge {
-  stroke: #334155 !important;
-  stroke-width: 1.4 !important;
+  stroke: #94A3B8 !important;
+  stroke-width: 1.2 !important;
 }
 
-/* Subtle Glowing Accents */
-.glow-brand {
-  box-shadow: 0 0 25px -4px rgba(139, 92, 246, 0.35);
+/* Edge Label Styling */
+.react-flow__edge-textbg {
+  fill: #FFFFFF !important;
+  fill-opacity: 0.95 !important;
+  stroke: #E2E8F0 !important;
+  stroke-width: 1 !important;
+  rx: 4 !important;
+  ry: 4 !important;
 }
 
-.glow-threat {
-  box-shadow: 0 0 25px -4px rgba(255, 59, 48, 0.35);
-}
-
-.glow-safe {
-  box-shadow: 0 0 25px -4px rgba(16, 185, 129, 0.35);
+.react-flow__edge-text {
+  font-family: "JetBrains Mono", monospace !important;
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
 }
