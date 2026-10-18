@@ -4,7 +4,10 @@
 
 [![FalkorDB Graph Hacks](https://img.shields.io/badge/FalkorDB-Graph%20Hacks-7C3AED?style=for-the-badge&logo=redis&logoColor=white)](https://www.wemakedevs.org/hackathons/falkordb)
 [![Track 01](https://img.shields.io/badge/Track%2001-Agents%20That%20Act%20on%20Connected%20Data-8B5CF6?style=for-the-badge)](https://www.wemakedevs.org/hackathons/falkordb#tracks)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://blastguard-cloud.vercel.app)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge)](LICENSE)
+
+🌐 **Live Application:** [https://blastguard-cloud.vercel.app](https://blastguard-cloud.vercel.app) *(Alternative: [https://blastguard-falkordb.vercel.app](https://blastguard-falkordb.vercel.app))*
 
 BlastGuard is an autonomous cloud-security investigation and remediation platform powered by **FalkorDB**. It ingests interconnected workloads, IAM identities, policies, and secrets, traces multi-hop privilege escalation paths across environments, evaluates collateral operational impact on modeled workloads, simulates least-privilege remediation, and proves path elimination through live FalkorDB graph recomputation.
 

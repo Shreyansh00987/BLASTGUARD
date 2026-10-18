@@ -25,12 +25,11 @@ Tagline: **Trace the attack. Cut the path. Prove it's gone.**
 
 ## Action Items for Participant Before Final Submission
 
-- [ ] **Capture Screenshots**: Take 2-3 high-resolution screenshots of the BlastGuard UI (Active Multi-Hop Graph, Evidence Panel with Cypher, and Verification Proof Modal).
-- [ ] **Record Demo Video**: Follow `docs/DEMO_SCRIPT.md` to record a 2–3 minute screen walkthrough showing the application in action.
 - [x] **Push to Public GitHub Repository**: Successfully created and pushed to [https://github.com/Shreyansh00987/BLASTGUARD](https://github.com/Shreyansh00987/BLASTGUARD).
+- [x] **Deploy Live to Vercel**: Production deployment live at [https://blastguard-cloud.vercel.app](https://blastguard-cloud.vercel.app) (Alias: [https://blastguard-falkordb.vercel.app](https://blastguard-falkordb.vercel.app)).
 - [ ] **Capture Screenshots**: Take 2-3 high-resolution screenshots of the BlastGuard UI (Active Multi-Hop Graph, Evidence Panel with Cypher, and Verification Proof Modal).
 - [ ] **Record Demo Video**: Follow `docs/DEMO_SCRIPT.md` to record a 2–3 minute screen walkthrough showing the application in action.
 - [ ] **Submit on WeMakeDevs Portal**:
   - Hackathon URL: `https://www.wemakedevs.org/hackathons/falkordb`
   - Track: `Track 01 — Agents That Act on Connected Data`
-  - Attach Public GitHub URL (`https://github.com/Shreyansh00987/BLASTGUARD`) and Demo Video Link.
+  - Attach Public GitHub URL (`https://github.com/Shreyansh00987/BLASTGUARD`), Live Vercel URL (`https://blastguard-cloud.vercel.app`), and Demo Video Link.

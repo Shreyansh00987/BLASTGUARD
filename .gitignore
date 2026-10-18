@@ -54,3 +54,6 @@ Thumbs.db
 # FalkorDB data
 falkordb_data/
 dump.rdb
+
+.vercel
+
