@@ -24,10 +24,10 @@ import {
   Database,
   ArrowRight,
   Maximize2,
-  Lock,
-  Server,
-  Key,
-  ShieldAlert,
+  ZoomIn,
+  ZoomOut,
+  Crosshair,
+  Sparkles,
 } from "lucide-react";
 
 interface GraphWorkspaceProps {
@@ -55,7 +55,7 @@ const FlowWorkspaceInner: React.FC<GraphWorkspaceProps> = ({
   isRemediatedClean,
   onOpenRemediateModal,
 }) => {
-  const { fitView } = useReactFlow();
+  const { fitView, zoomIn, zoomOut, zoomTo, setCenter } = useReactFlow();
 
   // Collect all node IDs and edge IDs on active attack paths
   const attackNodeIds = useMemo(() => {
@@ -70,70 +70,89 @@ const FlowWorkspaceInner: React.FC<GraphWorkspaceProps> = ({
     return set;
   }, [attackPaths]);
 
-  // Intelligent, non-overlapping deterministic layout for security graphs
+  // Intelligent, compact deterministic layout (Guarantees zero overlap & readable scale)
   const flowNodes: Node[] = useMemo(() => {
     if (!nodes.length) return [];
 
-    // Distinct positions for key scenario nodes to guarantee 0% overlap
-    const fixedLayout: Record<string, { x: number; y: number }> = {
-      // Alert 1: Reverse shell
-      "wkld-stage-payment-worker": { x: 80, y: 200 },
-      "sa-payment-worker-stage": { x: 480, y: 200 },
-      "role-cicd-runner-deployer": { x: 880, y: 200 },
-      "wkld-prod-nightly-backup-agent": { x: 880, y: -90 }, // Legitimate agent placed safely above
-      "pol-customer-backup-full-access": { x: 1300, y: 80 },
-      "pol-prod-master-decrypt": { x: 1300, y: 320 },
-      "db-prod-customer-aurora-cluster": { x: 1720, y: 80 },
-      "secret-kms-customer-master-key": { x: 1720, y: 320 },
+    // Precise coordinates matching both node ID and name patterns
+    const knownPositions: Record<string, { x: number; y: number }> = {
+      // Alert 1: Staging Reverse Shell -> Production DB/KMS
+      "wkld-stage-payment-worker": { x: 40, y: 160 },
+      "staging-payment-worker": { x: 40, y: 160 },
 
-      // Alert 2: Hardcoded CI/CD Token
-      "wkld-ci-cd-runner": { x: 80, y: 200 },
-      "sec-gh-actions-token": { x: 480, y: 200 },
+      "ident-stage-payment-sa": { x: 310, y: 160 },
+      "sa-payment-worker-stage": { x: 310, y: 160 },
 
-      // Alert 3: Ingress Gateway
-      "wkld-prod-ingress-gw": { x: 80, y: 200 },
-      "role-ingress-gw-identity": { x: 480, y: 200 },
-      "pol-wildcard-kms-decrypt": { x: 1300, y: 200 },
+      "ident-prod-deployer-role": { x: 580, y: 160 },
+      "role-cross-env-deployer": { x: 580, y: 160 },
+      "role-cicd-runner-deployer": { x: 580, y: 160 },
+
+      // Legitimate operational workload (Separated into upper lane)
+      "wkld-prod-backup-service": { x: 580, y: -60 },
+      "prod-nightly-backup-agent": { x: 580, y: -60 },
+
+      // Policies (Forked upper & lower)
+      "pol-prod-s3-backup-admin": { x: 850, y: 70 },
+      "PolicyS3CustomerBackupFullAccess": { x: 850, y: 70 },
+      "pol-customer-backup-full-access": { x: 850, y: 70 },
+
+      "pol-prod-kms-master-decrypt": { x: 850, y: 260 },
+      "PolicyKMSMasterDecryptKey": { x: 850, y: 260 },
+      "pol-prod-master-decrypt": { x: 850, y: 260 },
+
+      // Crown Jewels
+      "res-s3-prod-customer-pii": { x: 1120, y: 70 },
+      "prod-customer-pii-backups": { x: 1120, y: 70 },
+      "db-prod-customer-aurora-cluster": { x: 1120, y: 70 },
+
+      "res-kms-prod-envelope-key": { x: 1120, y: 260 },
+      "prod-master-envelope-key": { x: 1120, y: 260 },
+      "secret-kms-customer-master-key": { x: 1120, y: 260 },
+
+      // Alert 2: CI/CD Secret Exposure
+      "wkld-ci-batch-runner": { x: 40, y: 160 },
+      "ci-cd-build-runner-04": { x: 40, y: 160 },
+      "sec-github-deployer-token": { x: 310, y: 160 },
+      "ident-ci-deployer-role": { x: 580, y: 160 },
+      "pol-prod-rds-superuser": { x: 850, y: 160 },
+      "res-prod-customer-aurora-db": { x: 1120, y: 160 },
+
+      // Alert 3: Ingress Gateway KMS Decrypt
+      "wkld-public-ingress-gateway": { x: 40, y: 160 },
+      "prod-ingress-gateway-alb": { x: 40, y: 160 },
+      "ident-ingress-gateway-role": { x: 310, y: 160 },
+      "pol-prod-kms-wildcard-decrypt": { x: 580, y: 160 },
     };
 
-    // Fallback column calculation for any other node
-    const getColumnIndex = (node: IGraphNode) => {
+    // Fallback column assignment for any custom nodes
+    const getColIndex = (node: IGraphNode) => {
       const type = node.node_type;
       const id = node.id.toLowerCase();
-      if (type === "Workload" && !id.includes("backup")) return 0;
+      const name = (node.properties?.name || "").toLowerCase();
+      if (type === "Workload" && !id.includes("backup") && !name.includes("backup")) return 0;
       if (type === "Secret") return 1;
-      if (type === "Identity" && id.includes("stage")) return 1;
+      if (type === "Identity" && (id.includes("stage") || name.includes("stage"))) return 1;
       if (type === "Identity") return 2;
-      if (type === "Workload" && id.includes("backup")) return 2; // handled in fixed or swimlane
       if (type === "PermissionPolicy") return 3;
       if (type === "Resource") return 4;
       return 1;
     };
 
-    // Group remaining nodes by column
-    const colBuckets: Record<number, IGraphNode[]> = {};
-    nodes.forEach((n) => {
-      if (!fixedLayout[n.id]) {
-        const col = getColumnIndex(n);
-        colBuckets[col] = colBuckets[col] || [];
-        colBuckets[col].push(n);
-      }
-    });
-
+    // Calculate layout for each node
     const result: Node[] = [];
+    const colCounters: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 };
 
-    // Add fixed positioned nodes
     nodes.forEach((n) => {
-      let pos = fixedLayout[n.id];
+      const matchKey = knownPositions[n.id] ? n.id : n.properties?.name;
+      let pos = matchKey ? knownPositions[matchKey] : undefined;
+
       if (!pos) {
-        const col = getColumnIndex(n);
-        const colNodes = colBuckets[col] || [n];
-        const idx = colNodes.indexOf(n);
-        const total = colNodes.length;
-        const startY = 200 - ((total - 1) * 220) / 2;
+        const col = getColIndex(n);
+        const idxInCol = colCounters[col] || 0;
+        colCounters[col] = idxInCol + 1;
         pos = {
-          x: 80 + col * 400,
-          y: startY + idx * 220,
+          x: 40 + col * 270,
+          y: 70 + idxInCol * 190,
         };
       }
 
@@ -156,7 +175,7 @@ const FlowWorkspaceInner: React.FC<GraphWorkspaceProps> = ({
     return result;
   }, [nodes, selectedNodeId, attackNodeIds, isRemediatedClean]);
 
-  // High contrast edges for Light Mode
+  // High-contrast, clear edge labels
   const flowEdges: Edge[] = useMemo(() => {
     return edges.map((e) => {
       const isAttack = attackEdgeIds.has(e.id);
@@ -170,26 +189,26 @@ const FlowWorkspaceInner: React.FC<GraphWorkspaceProps> = ({
         animated: isAttack,
         className: isAttack ? "attack-path-edge" : isLegit ? "legitimate-edge" : "default-edge",
         labelStyle: {
-          fill: isAttack ? "#DC2626" : isLegit ? "#0284C7" : "#475569",
+          fill: isAttack ? "#DC2626" : isLegit ? "#0284C7" : "#334155",
           fontFamily: "JetBrains Mono, ui-monospace, monospace",
-          fontSize: 9.5,
-          fontWeight: isAttack ? 700 : 600,
+          fontSize: 11,
+          fontWeight: 700,
         },
         labelBgStyle: {
           fill: "#FFFFFF",
-          fillOpacity: 0.95,
+          fillOpacity: 0.98,
         },
-        labelBgPadding: [6, 3],
-        labelBgBorderRadius: 4,
+        labelBgPadding: [7, 3.5],
+        labelBgBorderRadius: 5,
         markerEnd: {
           type: MarkerType.ArrowClosed,
           color: isAttack ? "#DC2626" : isLegit ? "#0284C7" : "#94A3B8",
-          width: 18,
-          height: 18,
+          width: 20,
+          height: 20,
         },
         style: {
           stroke: isAttack ? "#DC2626" : isLegit ? "#0284C7" : "#CBD5E1",
-          strokeWidth: isAttack ? 2.6 : isLegit ? 1.8 : 1.3,
+          strokeWidth: isAttack ? 3.0 : isLegit ? 2.0 : 1.4,
         },
       };
     });
@@ -204,87 +223,130 @@ const FlowWorkspaceInner: React.FC<GraphWorkspaceProps> = ({
 
   return (
     <div className="flex-1 h-full relative bg-canvas flex flex-col overflow-hidden">
-      {/* 1. Horizontal Attack Progression Pipeline Bar */}
-      <div className="bg-white border-b border-slate-200 px-4 py-2 flex items-center justify-between text-xs font-mono shadow-sm z-10">
+      {/* 1. Horizontal Attack Progression Tracker & Action Bar */}
+      <div className="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between gap-3 text-xs font-sans shadow-sm z-10 flex-wrap">
+        {/* Left: Progression Stages */}
         <div className="flex items-center gap-2 overflow-x-auto py-0.5">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider hidden sm:inline mr-1">
+          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider hidden sm:inline mr-1">
             Attack Vector:
           </span>
 
-          {/* Stage 1: Workload Breach */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 border border-red-200 text-red-700 font-semibold text-[11px] whitespace-nowrap shadow-sm">
-            <span className="w-4 h-4 rounded-full bg-red-600 text-white flex items-center justify-center text-[9px] font-bold">1</span>
-            <span>Compromised Pod</span>
-          </div>
+          {isRemediatedClean ? (
+            <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-800 font-bold text-xs shadow-sm animate-in fade-in">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>THREAT SEVERED · 0 ACTIVE ATTACK PATHS IN FALKORDB</span>
+            </div>
+          ) : (
+            <>
+              {/* Stage 1: Compromised Workload */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 border border-red-200 text-red-800 font-bold text-xs whitespace-nowrap shadow-sm">
+                <span className="w-4 h-4 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] font-extrabold">1</span>
+                <span>Compromised Pod</span>
+              </div>
 
-          <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
 
-          {/* Stage 2: IAM Identity */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-50 border border-purple-200 text-purple-700 font-semibold text-[11px] whitespace-nowrap shadow-sm">
-            <span className="w-4 h-4 rounded-full bg-purple-600 text-white flex items-center justify-center text-[9px] font-bold">2</span>
-            <span>Escalated IAM Role</span>
-          </div>
+              {/* Stage 2: IAM Identity */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 border border-purple-200 text-purple-800 font-bold text-xs whitespace-nowrap shadow-sm">
+                <span className="w-4 h-4 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-extrabold">2</span>
+                <span>Escalated IAM Role</span>
+              </div>
 
-          <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
 
-          {/* Stage 3: Wildcard Policy */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-50 border border-rose-200 text-rose-700 font-semibold text-[11px] whitespace-nowrap shadow-sm">
-            <span className="w-4 h-4 rounded-full bg-rose-600 text-white flex items-center justify-center text-[9px] font-bold">3</span>
-            <span>Excessive Policy</span>
-          </div>
+              {/* Stage 3: Wildcard Policy */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 font-bold text-xs whitespace-nowrap shadow-sm">
+                <span className="w-4 h-4 rounded-full bg-rose-600 text-white flex items-center justify-center text-[10px] font-extrabold">3</span>
+                <span>Excessive Policy</span>
+              </div>
 
-          <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
 
-          {/* Stage 4: Crown Jewel Database */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 border border-amber-300 text-amber-800 font-bold text-[11px] whitespace-nowrap shadow-sm">
-            <span className="w-4 h-4 rounded-full bg-amber-600 text-white flex items-center justify-center text-[9px] font-bold">4</span>
-            <span>Crown Jewels (Aurora DB / KMS)</span>
-          </div>
+              {/* Stage 4: Crown Jewels */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 font-bold text-xs whitespace-nowrap shadow-sm">
+                <span className="w-4 h-4 rounded-full bg-amber-600 text-white flex items-center justify-center text-[10px] font-extrabold">4</span>
+                <span>Crown Jewels (Aurora DB / KMS)</span>
+              </div>
+            </>
+          )}
         </div>
 
-        {/* View Actions */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Right: Quick View Controls */}
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
-            onClick={() => fitView({ padding: 0.18, duration: 400 })}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-md border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-[11px] font-medium transition-colors shadow-sm"
-            title="Auto-fit all graph nodes in viewport"
+            onClick={() => zoomIn({ duration: 250 })}
+            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors shadow-sm"
+            title="Zoom In"
           >
-            <Maximize2 className="w-3 h-3 text-slate-500" />
+            <ZoomIn className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => zoomOut({ duration: 250 })}
+            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors shadow-sm"
+            title="Zoom Out"
+          >
+            <ZoomOut className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => zoomTo(1.0, { duration: 300 })}
+            className="px-2 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold font-mono transition-colors shadow-sm"
+            title="Reset Zoom to 100% (Crisp 1:1 view)"
+          >
+            100%
+          </button>
+          <button
+            onClick={() => fitView({ padding: 0.12, duration: 300 })}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors shadow-sm"
+            title="Auto-fit graph to window"
+          >
+            <Maximize2 className="w-3.5 h-3.5 text-slate-500" />
             <span className="hidden md:inline">Fit Graph</span>
           </button>
+
+          {attackPaths.length > 0 && !isRemediatedClean && onOpenRemediateModal && (
+            <button
+              onClick={onOpenRemediateModal}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold font-sans transition-all shadow-sm active:scale-95 ml-1"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Simulate Fix</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* 2. Top Canvas Status Bar */}
-      <div className="h-9 px-4 border-b border-slate-200/90 bg-slate-50/90 flex items-center justify-between z-10 text-xs font-mono">
+      {/* 2. Status HUD Bar */}
+      <div className="h-9 px-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between z-10 text-xs font-sans">
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600">
+          <div className="w-4 h-4 rounded bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-700">
             <Layers className="w-2.5 h-2.5" />
           </div>
-          <span className="text-slate-900 font-bold">ATTACK GRAPH CANVAS</span>
+          <span className="text-slate-900 font-bold uppercase tracking-wide text-[11px]">
+            ATTACK GRAPH CANVAS
+          </span>
           <span className="text-slate-300">·</span>
-          <span className="text-slate-500 text-[11px]">FalkorDB Subgraph Projection</span>
+          <span className="text-slate-600 text-xs font-medium">FalkorDB Subgraph Projection</span>
         </div>
 
         {isRemediatedClean ? (
-          <div className="flex items-center gap-1.5 text-emerald-800 font-bold bg-emerald-50 border border-emerald-300 px-2.5 py-0.5 rounded-full shadow-sm animate-in fade-in">
+          <div className="flex items-center gap-1.5 text-emerald-800 font-bold bg-emerald-50 border border-emerald-300 px-3 py-0.5 rounded-full shadow-sm animate-in fade-in">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
             <span>THREAT SEVERED · ZERO REACHABLE CROWN JEWELS</span>
           </div>
         ) : attackPaths.length > 0 ? (
-          <div className="flex items-center gap-1.5 text-red-800 font-bold bg-red-50 border border-red-300 px-2.5 py-0.5 rounded-full shadow-sm">
+          <div className="flex items-center gap-1.5 text-red-800 font-bold bg-red-50 border border-red-300 px-3 py-0.5 rounded-full shadow-sm">
             <AlertTriangle className="w-3.5 h-3.5 text-red-600 animate-pulse" />
             <span>{attackPaths.length} MULTI-HOP ATTACK PATH(S) DETECTED</span>
           </div>
         ) : (
-          <div className="text-slate-500 text-[11px]">Select an incident to run graph traversal</div>
+          <div className="text-slate-500 text-xs">Select an incident to run graph traversal</div>
         )}
       </div>
 
       {/* 3. Main React Flow Canvas */}
-      <div className="flex-1 w-full h-full relative bg-slate-50/40">
+      <div className="flex-1 w-full h-full relative bg-slate-50/50">
         {isLoading ? (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/85 backdrop-blur-sm">
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm">
             <div className="relative flex items-center justify-center mb-3">
               <div className="w-10 h-10 rounded-full border-2 border-indigo-200 border-t-indigo-600 animate-spin" />
               <Database className="w-4 h-4 text-indigo-600 absolute" />
@@ -312,8 +374,8 @@ const FlowWorkspaceInner: React.FC<GraphWorkspaceProps> = ({
           onNodeClick={onNodeClick}
           nodeTypes={nodeTypes}
           fitView
-          fitViewOptions={{ padding: 0.16 }}
-          minZoom={0.2}
+          fitViewOptions={{ padding: 0.1, minZoom: 0.7, maxZoom: 1.0 }}
+          minZoom={0.3}
           maxZoom={1.8}
         >
           <Background color="#CBD5E1" gap={22} size={1} />
@@ -333,31 +395,31 @@ const FlowWorkspaceInner: React.FC<GraphWorkspaceProps> = ({
         </ReactFlow>
 
         {/* 4. Canvas Floating Legend Bar */}
-        <div className="absolute bottom-4 left-44 z-10 hidden md:flex items-center gap-4 bg-white/95 backdrop-blur-md border border-slate-200 px-3.5 py-1.5 rounded-lg text-[10px] font-mono shadow-sm select-none">
+        <div className="absolute bottom-4 left-44 z-10 hidden md:flex items-center gap-4 bg-white/95 backdrop-blur-md border border-slate-200 px-4 py-2 rounded-xl text-xs font-sans shadow-sm select-none">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-indigo-600" />
-            <span className="text-slate-700 font-medium">Workload</span>
+            <span className="w-3 h-3 rounded-sm bg-indigo-600" />
+            <span className="text-slate-800 font-semibold">Workload</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-purple-600" />
-            <span className="text-slate-700 font-medium">Identity</span>
+            <span className="w-3 h-3 rounded-sm bg-purple-600" />
+            <span className="text-slate-800 font-semibold">Identity</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-rose-600" />
-            <span className="text-slate-700 font-medium">Policy</span>
+            <span className="w-3 h-3 rounded-sm bg-rose-600" />
+            <span className="text-slate-800 font-semibold">Policy</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-amber-500" />
-            <span className="text-amber-800 font-bold">Crown Jewel (Tier-0)</span>
+            <span className="w-3 h-3 rounded-sm bg-amber-500" />
+            <span className="text-amber-900 font-bold">Crown Jewel (Tier-0)</span>
           </div>
           <span className="text-slate-300">|</span>
           <div className="flex items-center gap-1.5">
-            <span className="w-4 h-1 bg-red-600 rounded-full" />
+            <span className="w-4 h-1.5 bg-red-600 rounded-full" />
             <span className="text-red-700 font-bold">Attack Traversal</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-4 h-0.5 bg-sky-600 border-dashed" />
-            <span className="text-sky-700 font-medium">Modeled Legitimate Traffic</span>
+            <span className="w-4 h-1 bg-sky-600 border-dashed" />
+            <span className="text-sky-800 font-semibold">Modeled Legitimate Traffic</span>
           </div>
         </div>
       </div>
