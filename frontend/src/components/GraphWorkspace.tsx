@@ -113,15 +113,22 @@ const FlowWorkspaceInner: React.FC<GraphWorkspaceProps> = ({
       "wkld-ci-batch-runner": { x: 40, y: 160 },
       "ci-cd-build-runner-04": { x: 40, y: 160 },
       "sec-github-deployer-token": { x: 310, y: 160 },
-      "ident-ci-deployer-role": { x: 580, y: 160 },
-      "pol-prod-rds-superuser": { x: 850, y: 160 },
-      "res-prod-customer-aurora-db": { x: 1120, y: 160 },
+      "github-actions-deployer-token": { x: 310, y: 160 },
+      "ident-ci-service-account": { x: 580, y: 160 },
+      "sa-ci-pipeline-runner": { x: 580, y: 160 },
+      "pol-rds-superuser-access": { x: 850, y: 160 },
+      "PolicyRDSFinancialLedgerAdmin": { x: 850, y: 160 },
+      "res-prod-fin-ledger-rds": { x: 1120, y: 160 },
+      "prod-fin-ledger-rds": { x: 1120, y: 160 },
 
       // Alert 3: Ingress Gateway KMS Decrypt
       "wkld-public-ingress-gateway": { x: 40, y: 160 },
       "prod-ingress-gateway-alb": { x: 40, y: 160 },
       "ident-ingress-gateway-role": { x: 310, y: 160 },
+      "role-prod-ingress-gateway": { x: 310, y: 160 },
+      "pol-kms-wildcard-decrypt": { x: 580, y: 160 },
       "pol-prod-kms-wildcard-decrypt": { x: 580, y: 160 },
+      "PolicyWildcardKMSDecrypt": { x: 580, y: 160 },
     };
 
     // Fallback column assignment for any custom nodes
