@@ -28,7 +28,8 @@ Tagline: **Trace the attack. Cut the path. Prove it's gone.**
 - [x] **Push to Public GitHub Repository**: Successfully created and pushed to [https://github.com/Shreyansh00987/BLASTGUARD](https://github.com/Shreyansh00987/BLASTGUARD).
 - [x] **Deploy Live to Vercel**: Production deployment live at [https://blastguard-cloud.vercel.app](https://blastguard-cloud.vercel.app) (Alias: [https://blastguard-falkordb.vercel.app](https://blastguard-falkordb.vercel.app)).
 - [x] **Record Demo Video**: Generated in Full HD 1080p with studio AI voiceover ([`blastguard_demo_video.mp4`](file:///d:/Project/BLASTGUARD/blastguard_demo_video.mp4), duration: 65.28s).
+- [x] **Publish Technical Article on Dev.to**: Published live at [https://dev.to/shreyansh_agrahari_2009db/trace-the-attack-cut-the-path-prove-its-gone-building-blastguard-with-falkordb-52ed](https://dev.to/shreyansh_agrahari_2009db/trace-the-attack-cut-the-path-prove-its-gone-building-blastguard-with-falkordb-52ed).
 - [ ] **Submit on WeMakeDevs Portal**:
   - Hackathon URL: `https://www.wemakedevs.org/hackathons/falkordb`
   - Track: `Track 01 — Agents That Act on Connected Data`
-  - Attach Public GitHub URL (`https://github.com/Shreyansh00987/BLASTGUARD`), Live Vercel URL (`https://blastguard-cloud.vercel.app`), and Demo Video Link.
+  - Attach Public GitHub URL (`https://github.com/Shreyansh00987/BLASTGUARD`), Live Vercel URL (`https://blastguard-cloud.vercel.app`), Demo Video Link, and Dev.to Article Link.
