@@ -7,7 +7,8 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://blastguard-cloud.vercel.app)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge)](LICENSE)
 
-🌐 **Live Application:** [https://blastguard-cloud.vercel.app](https://blastguard-cloud.vercel.app) *(Alternative: [https://blastguard-falkordb.vercel.app](https://blastguard-falkordb.vercel.app))*
+🌐 **Live Application:** [https://blastguard-cloud.vercel.app](https://blastguard-cloud.vercel.app) *(Alternative: [https://blastguard-falkordb.vercel.app](https://blastguard-falkordb.vercel.app))*  
+🎬 **Demo Video (Full HD 1080p with AI Voiceover):** [`blastguard_demo_video.mp4`](blastguard_demo_video.mp4) *(Duration: 1m 05s)*
 
 BlastGuard is an autonomous cloud-security investigation and remediation platform powered by **FalkorDB**. It ingests interconnected workloads, IAM identities, policies, and secrets, traces multi-hop privilege escalation paths across environments, evaluates collateral operational impact on modeled workloads, simulates least-privilege remediation, and proves path elimination through live FalkorDB graph recomputation.
 
