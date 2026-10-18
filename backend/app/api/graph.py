@@ -7,6 +7,7 @@ router = APIRouter(prefix="/graph", tags=["Graph Inspection"])
 
 
 @router.get("/inspect/node/{node_id}")
+@router.get("/node/{node_id}")
 def inspect_node(node_id: str):
     """Retrieves full properties, labels, and connected relationships for a selected node."""
     if node_id not in db_manager.embedded_engine.nodes:
@@ -48,6 +49,7 @@ def inspect_node(node_id: str):
 
 
 @router.get("/inspect/policy/{policy_id}")
+@router.get("/policy/{policy_id}")
 def inspect_policy(policy_id: str):
     """Inspects a permission policy and all connected identities and target resources."""
     details = db_manager.inspect_policy(policy_id)
